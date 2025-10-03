@@ -16,13 +16,15 @@ from HMM_functions import *
 
 
 #import data 
-main_dir = '/proj/telston_lab/projects/data/DataForTFM/TFM_Data_02242025'
-dipole_dict, ellipse_dict, quad_dict = force_ellipse_dict(main_dir)
+data_dir = '/Users/emae/Desktop/Analysis_Code/data'
+dipole_dict = np.load(data_dir + '/dipole_dict.npy', allow_pickle=True).item()
+ellipse_dict = np.load(data_dir + '/ellipse_dict.npy', allow_pickle=True).item()
+quad_dict = np.load(data_dir + '/quad_dict.npy', allow_pickle=True).item()
 
-tracksgeo_path = '/proj/telston_lab/projects/data/SegmentationAnalysis/TrackMetrics/tracks_geo_region.pkl'
+tracksgeo_path = data_dir + '/tracks_geo_region.pkl'
 tracksgeo_dict = load_tracksgeo(tracksgeo_path, dipole_dict)
 
-csv_path = '/proj/telston_lab/projects/data/DataForTFM/skeleton.csv'
+csv_path = data_dir + '/skeleton.csv'
 skeleton_df = load_skeletondf(csv_path)
 
 arpc2ko_cells, wt_cells, lengths_arpc2ko, lengths_wt, pooled_arpc2ko_df, pooled_wt_df = combine_data(tracksgeo_dict, ellipse_dict, dipole_dict, quad_dict, skeleton_df)
@@ -81,6 +83,14 @@ cell_states_wt, state_probs_wt = get_states_and_probs(lengths_wt, model, np.vsta
 arpc2ko_state0_df, arpc2ko_state1_df, arpc2ko_state0_summary_df, arpc2ko_state1_summary_df = calculate_segment_metrics(arpc2ko_cells, cell_states_arpc2ko)
 wt_state0_df, wt_state1_df, wt_state0_summary_df, wt_state1_summary_df = calculate_segment_metrics(wt_cells, cell_states_wt)
 
-data_bp = pd.concat([arpc2ko_state0_summary_df,arpc2ko_state1_summary_df,wt_state0_summary_df,wt_state1_summary_df])
-save_path = '/nas/longleaf/home/emae/Cell_TrackingII/Python_Scripts/figures'
-stripplot_hmm('segment_speed', data_bp, save_path, 'segment_speed_summary_stripplot')
+data_bp = pd.concat([arpc2ko_state0_df,arpc2ko_state1_df,wt_state0_df,wt_state1_df])
+save_path = '/Users/emae/Desktop/Analysis_Code/Python_Scripts/figures/stripplots'
+
+numeric_arpc2ko_state0_df = arpc2ko_state0_df.select_dtypes(include=np.number)
+numeric_arpc2ko_state1_df = arpc2ko_state1_df.select_dtypes(include=np.number)
+numeric_wt_state0_df = wt_state0_df.select_dtypes(include=np.number)
+numeric_wt_state1_df = wt_state1_df.select_dtypes(include=np.number)
+
+for column in numeric_arpc2ko_state0_df.columns:
+    print(column)
+    stripplot_hmm(column, data_bp, save_path, '{}_stripplot'.format(column))

@@ -71,12 +71,12 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
         
     final_df = pd.concat(updated_df_list, ignore_index=True)
 
-    state0_df = final_df[final_df['state'] == 0].copy()
-    state1_df = final_df[final_df['state'] == 1].copy()
+    state0_df_final = final_df[final_df['state'] == 0].copy()
+    state1_df_final = final_df[final_df['state'] == 1].copy()
 
     type = final_df['type'].iloc[0]
-    state0_df['state'] = ['state 0 {}'.format(type)] * len(state0_df)
-    state1_df['state'] = ['state 1 {}'.format(type)] * len(state1_df)
+    state0_df_final['state_name'] = ['state 0 {}'.format(type)] * len(state0_df_final)
+    state1_df_final['state_name'] = ['state 1 {}'.format(type)] * len(state1_df_final)
 
     state0_summary_df = []
     state1_summary_df = []
@@ -100,22 +100,22 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
     state0_summary_df = pd.concat(state0_summary_df,axis=1).T
     state1_summary_df = pd.concat(state1_summary_df,axis=1).T
     
-    state0_summary_df['state'] = ['state 0 {}'.format(type)] * len(state0_summary_df)
-    state1_summary_df['state'] = ['state 1 {}'.format(type)] * len(state1_summary_df)
+    state0_summary_df['state_name'] = ['state 0 {}'.format(type)] * len(state0_summary_df)
+    state1_summary_df['state_name'] = ['state 1 {}'.format(type)] * len(state1_summary_df)
 
-    return state0_df, state1_df, state0_summary_df, state1_summary_df
+    return state0_df_final, state1_df_final, state0_summary_df, state1_summary_df
 
 #####################################################################################################################################################################################
 
 def stripplot_hmm(param, data_bp, save_path, plot_name):
-    sns.stripplot(data=data_bp, x='state', y=param, hue='dishnum',alpha=0.7,palette='deep')
-    sns.pointplot(data=data_bp, x="state", y=param,linestyle="none",marker="_",markersize=50,capsize=.2,markeredgewidth=3,color=".5",errorbar='sd')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==1], x="state", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[0],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==2], x="state", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[1],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==3], x="state", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[2],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==4], x="state", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[3],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==5], x="state", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[4],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==6], x="state", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[5],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    sns.stripplot(data=data_bp, x='state_name', y=param, hue='dishnum',alpha=0.7,palette='deep')
+    sns.pointplot(data=data_bp, x="state_name", y=param,linestyle="none",marker="_",markersize=50,capsize=.2,markeredgewidth=3,color=".5",errorbar='sd')
+    sns.pointplot(data=data_bp[data_bp['dishnum']==1], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[0],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    sns.pointplot(data=data_bp[data_bp['dishnum']==2], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[1],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    sns.pointplot(data=data_bp[data_bp['dishnum']==3], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[2],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    sns.pointplot(data=data_bp[data_bp['dishnum']==4], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[3],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    sns.pointplot(data=data_bp[data_bp['dishnum']==5], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[4],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    sns.pointplot(data=data_bp[data_bp['dishnum']==6], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[5],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
     
     plt.xlabel("Type")
     plt.ylabel("{}".format(param))
