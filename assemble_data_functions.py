@@ -131,11 +131,11 @@ def combine_data(tracksgeo_dict, ellipse_dict, dipole_dict, quad_dict, skeleton_
             new_df['avg_trac_mag'] = dipole_dict[name]['avg_trac_mag'][::3][:limit]
             new_df['dip_ratio'] = np.abs((dipole_dict[name]['minor_axis_eigenval']/dipole_dict[name]['major_axis_eigenval'])[::3][:limit])
             new_df['maj_dip'] = dipole_dict[name]['major_axis_eigenval'][::3][:limit]
-            new_df['MxxTx'] = quad_dict[name]['MxxTx'][::3][:limit] * (10**9) * ((10**6)**2)
-            new_df['MxxTy'] = quad_dict[name]['MxxTy'][::3][:limit] * (10**9) * ((10**6)**2)
-            new_df['MxyTx'] = quad_dict[name]['MxyTx'][::3][:limit] * (10**9) * ((10**6)**2)
-            new_df['MyyTx'] = quad_dict[name]['MyyTx'][::3][:limit] * (10**9) * ((10**6)**2)
-            new_df['MyyTy'] = quad_dict[name]['MyyTy'][::3][:limit] * (10**9) * ((10**6)**2)
+            new_df['MxxTx'] = np.abs(quad_dict[name]['MxxTx'][::3][:limit] * (10**9) * ((10**6)**2))
+            new_df['MxxTy'] = np.abs(quad_dict[name]['MxxTy'][::3][:limit] * (10**9) * ((10**6)**2))
+            new_df['MxyTx'] = np.abs(quad_dict[name]['MxyTx'][::3][:limit] * (10**9) * ((10**6)**2))
+            new_df['MyyTx'] = np.abs(quad_dict[name]['MyyTx'][::3][:limit] * (10**9) * ((10**6)**2))
+            new_df['MyyTy'] = np.abs(quad_dict[name]['MyyTy'][::3][:limit] * (10**9) * ((10**6)**2))
             new_df['eccentricity'] = tracksgeo_dict[name]['eccentricity'].dropna().array[::3][:limit]
             new_df['change_ecc'] = np.diff(tracksgeo_dict[name]['eccentricity'].dropna().array[::3])[:limit]
             new_df['solidity'] = tracksgeo_dict[name]['solidity'].dropna().array[::3][:limit]
