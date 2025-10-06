@@ -14,7 +14,7 @@ from get_data_functions import *
 from assemble_data_functions import *
 from HMM_functions import *
 from plot_dist_functions import *
-
+from cross_corr_functions import *
 
 #import data 
 data_dir = './data'
@@ -85,33 +85,8 @@ arpc2ko_cells_states, arpc2ko_state0_df, arpc2ko_state1_df, arpc2ko_state0_mean_
 wt_cells_states, wt_state0_df, wt_state1_df, wt_state0_mean_summary_df, wt_state1_mean_summary_df, wt_state0_median_summary_df, wt_state1_median_summary_df = calculate_segment_metrics(wt_cells, cell_states_wt)
 
 
-numeric_arpc2ko_state0_df = arpc2ko_state0_df.select_dtypes(include=np.number)
-numeric_arpc2ko_state1_df = arpc2ko_state1_df.select_dtypes(include=np.number)
-numeric_wt_state0_df = wt_state0_df.select_dtypes(include=np.number)
-numeric_wt_state1_df = wt_state1_df.select_dtypes(include=np.number)
-
-data_bp = pd.concat([arpc2ko_state0_df,arpc2ko_state1_df,wt_state0_df,wt_state1_df]).reset_index()
-save_path = './figures/stripplots'
-for column in numeric_arpc2ko_state0_df.columns:
-    print(column)
-    stripplot_hmm(column, data_bp, save_path, '{}_stripplot'.format(column))
-    plot_dist(column, arpc2ko_state0_df, arpc2ko_state1_df, 'State 0', 'State 1', save_path, column + '_ARPC2KO_distribution')  
-    plot_dist(column, wt_state0_df, wt_state1_df, 'State 0', 'State 1', save_path, column + '_WT_distribution') 
+feature1 = 'eccentricity'
+feature2 = 'dip_ratio'
+pooled_poscorr_arpc2ko, pooled_negcorr_arpc2ko, pooled_else_arpc2ko, pooled_poscorr_wt, pooled_negcorr_wt, pooled_else_wt, predictedstates_negcorr_arpc2ko, predictedstates_else_arpc2ko, predictedstates_negcorr_wt, predictedstates_else_wt = apply_cross_corr(feature1, feature2, arpc2ko_cells_states, wt_cells_states)
 
 
-data_bp = pd.concat([arpc2ko_state0_mean_summary_df,arpc2ko_state1_mean_summary_df,wt_state0_mean_summary_df,wt_state1_mean_summary_df]).reset_index()
-save_path = './figures/stripplots_mean'
-for column in numeric_arpc2ko_state0_df.columns:
-    print(column)
-    stripplot_hmm(column, data_bp, save_path, '{}_stripplot'.format(column))
-    plot_dist(column, arpc2ko_state0_mean_summary_df, arpc2ko_state1_mean_summary_df, 'State 0', 'State 1', save_path, column + '_ARPC2KO_mean_distribution')  
-    plot_dist(column, wt_state0_mean_summary_df, wt_state1_mean_summary_df, 'State 0', 'State 1', save_path, column + '_WT_mean_distribution') 
-
-
-data_bp = pd.concat([arpc2ko_state0_median_summary_df,arpc2ko_state1_median_summary_df,wt_state0_median_summary_df,wt_state1_median_summary_df]).reset_index()
-save_path = './figures/stripplots_median'
-for column in numeric_arpc2ko_state0_df.columns:
-    print(column)
-    stripplot_hmm(column, data_bp, save_path, '{}_stripplot'.format(column)) 
-    plot_dist(column, arpc2ko_state0_median_summary_df, arpc2ko_state1_median_summary_df, 'State 0', 'State 1', save_path, column + '_ARPC2KO_median_distribution')  
-    plot_dist(column, wt_state0_median_summary_df, wt_state1_median_summary_df, 'State 0', 'State 1', save_path, column + '_WT_median_distribution')

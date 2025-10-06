@@ -78,8 +78,8 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
     state0_df_final['state_name'] = ['state 0 {}'.format(type)] * len(state0_df_final)
     state1_df_final['state_name'] = ['state 1 {}'.format(type)] * len(state1_df_final)
 
-    state0_summary_df = []
-    state1_summary_df = []
+    state0_mean_summary_df = []
+    state1_mean_summary_df = []
     for track_df in updated_df_list:
         state0_df = track_df[track_df['state'] == 0]
         state1_df = track_df[track_df['state'] == 1]
@@ -88,22 +88,48 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
             means = state0_df.mean(numeric_only = True)
             
             means.loc['track_name']=(state0_df['experiment'].iloc[0] + '_movie' + str(int(state0_df['movie'].iloc[0])) + '_track' + str(int(state0_df['track_id'].iloc[0])))
-            state0_summary_df.append(means)
+            state0_mean_summary_df.append(means)
             
         if len(state1_df) > 0:
             means = state1_df.mean(numeric_only = True)
             
             means.loc['track_name']=(state1_df['experiment'].iloc[0] + '_movie' + str(int(state1_df['movie'].iloc[0])) + '_track' + str(int(state1_df['track_id'].iloc[0])))
-            state1_summary_df.append(means)
+            state1_mean_summary_df.append(means)
     
             
-    state0_summary_df = pd.concat(state0_summary_df,axis=1).T
-    state1_summary_df = pd.concat(state1_summary_df,axis=1).T
+    state0_mean_summary_df = pd.concat(state0_mean_summary_df,axis=1).T
+    state1_mean_summary_df = pd.concat(state1_mean_summary_df,axis=1).T
     
-    state0_summary_df['state_name'] = ['state 0 {}'.format(type)] * len(state0_summary_df)
-    state1_summary_df['state_name'] = ['state 1 {}'.format(type)] * len(state1_summary_df)
+    state0_mean_summary_df['state_name'] = ['state 0 {}'.format(type)] * len(state0_mean_summary_df)
+    state1_mean_summary_df['state_name'] = ['state 1 {}'.format(type)] * len(state1_mean_summary_df)
 
-    return state0_df_final, state1_df_final, state0_summary_df, state1_summary_df
+    state0_median_summary_df = []
+    state1_median_summary_df = []
+    for track_df in updated_df_list:
+        state0_df = track_df[track_df['state'] == 0]
+        state1_df = track_df[track_df['state'] == 1]
+        
+        if len(state0_df) > 0:
+            medians = state0_df.median(numeric_only = True)
+            
+            medians.loc['track_name']=(state0_df['experiment'].iloc[0] + '_movie' + str(int(state0_df['movie'].iloc[0])) + '_track' + str(int(state0_df['track_id'].iloc[0])))
+            state0_median_summary_df.append(medians)
+            
+        if len(state1_df) > 0:
+            medians = state1_df.median(numeric_only = True)
+            
+            medians.loc['track_name']=(state1_df['experiment'].iloc[0] + '_movie' + str(int(state1_df['movie'].iloc[0])) + '_track' + str(int(state1_df['track_id'].iloc[0])))
+            state1_median_summary_df.append(medians)
+    
+            
+    state0_median_summary_df = pd.concat(state0_median_summary_df,axis=1).T
+    state1_median_summary_df = pd.concat(state1_median_summary_df,axis=1).T
+    
+    state0_median_summary_df['state_name'] = ['state 0 {}'.format(type)] * len(state0_median_summary_df)
+    state1_median_summary_df['state_name'] = ['state 1 {}'.format(type)] * len(state1_median_summary_df)
+
+    return updated_df_list, state0_df_final, state1_df_final, state0_mean_summary_df, state1_mean_summary_df, state0_median_summary_df, state1_median_summary_df
+
 
 #####################################################################################################################################################################################
 
