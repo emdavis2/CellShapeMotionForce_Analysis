@@ -11,7 +11,7 @@ from plot_dist_functions import *
 
 
 #import data 
-data_dir = './data'
+data_dir = '/Users/emae/Desktop/Analysis_Code/data'
 dipole_dict = np.load(data_dir + '/dipole_dict.npy', allow_pickle=True).item()
 ellipse_dict = np.load(data_dir + '/ellipse_dict.npy', allow_pickle=True).item()
 quad_dict = np.load(data_dir + '/quad_dict.npy', allow_pickle=True).item()
@@ -27,7 +27,20 @@ arpc2ko_cells, wt_cells, lengths_arpc2ko, lengths_wt, pooled_arpc2ko_df, pooled_
 numeric_pooled_arpc2ko_df = pooled_arpc2ko_df.select_dtypes(include=np.number)
 numeric_pooled_wt_df = pooled_wt_df.select_dtypes(include=np.number)
 
-save_path = './figures/histograms'
+save_path = './figures/corr_plots'
 
-for column in numeric_pooled_arpc2ko_df.columns:
-    plot_dist(column, numeric_pooled_arpc2ko_df, numeric_pooled_wt_df, 'ARPC2KO', 'WT', save_path, column + ' distribution') 
+for column1 in numeric_pooled_arpc2ko_df.columns:
+    for column2 in numeric_pooled_arpc2ko_df:
+        plt.plot(pooled_wt_df[column1],pooled_wt_df[column2],'.',color='tab:blue',label='WT')
+        plt.plot(pooled_arpc2ko_df[column1],pooled_arpc2ko_df[column2],'.', color='tab:orange',label='ARPC2KO')
+
+        plt.xlabel('{}'.format(column1))
+        plt.ylabel('{}'.format(column2))
+
+        plt.legend()
+
+        # r, pval = pearsonr(pooled_arpc2ko_df[param1],pooled_arpc2ko_df[param2])
+        # print(f"Pearson r = {r:.3f}, p = {pval:.3e}")
+
+        # r, pval = pearsonr(pooled_wt_df[param1],pooled_wt_df[param2])
+        # print(f"Pearson r = {r:.3f}, p = {pval:.3e}")

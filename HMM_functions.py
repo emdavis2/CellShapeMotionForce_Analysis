@@ -121,5 +121,6 @@ def stripplot_hmm(param, data_bp, save_path, plot_name):
     plt.ylabel("{}".format(param))
     plt.xticks(rotation=90)
 
+
     plt.savefig('{}/{}.png'.format(save_path, plot_name),bbox_inches='tight')
     plt.clf()
