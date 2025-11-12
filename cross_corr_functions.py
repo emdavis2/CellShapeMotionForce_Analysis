@@ -43,7 +43,7 @@ def cross_correlation_analysis(x, y, max_lag=None, n_permutations=1000):
 def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
     max_lag = 12
 
-    threshold = 0.7
+    threshold = 0.5
 
     pos_corr_arpc2ko_cells = []
     neg_corr_arpc2ko_cells = []
@@ -56,13 +56,22 @@ def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
     all_lags_arpc2ko = []
     all_corr_arpc2ko = []
 
+    neg_corr_arpc2ko = []
+    pos_corr_arpc2ko = []
+    else_corr_arpc2ko = []
+
     names_arpc2ko = []
+
+    neg_corr_names_arpc2ko = []
+    pos_corr_names_arpc2ko = []
+    else_corr_names_arpc2ko = []
 
     for df in arpc2ko_cells:
         signal1 = df[feature1][:max_lag]
         signal2 = df[feature2][:max_lag]
 
-        names_arpc2ko.append(df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0])))
+        name = df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0]))
+        names_arpc2ko.append(name)
         
         best_lag, best_corr, pval, lags, corr = cross_correlation_analysis(signal1, signal2)
 
@@ -75,11 +84,19 @@ def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
 
         if best_corr < 0 and np.abs(best_corr) > threshold:
             neg_corr_arpc2ko_cells.append(df)
+            neg_corr_arpc2ko.append(corr)
+            neg_corr_names_arpc2ko.append(name)
         elif np.abs(best_corr) > threshold:
             pos_corr_arpc2ko_cells.append(df)
             else_corr_arpc2ko_cells.append(df)
+            pos_corr_arpc2ko.append(corr)
+            else_corr_arpc2ko.append(corr)
+            pos_corr_names_arpc2ko.append(name)
+            else_corr_names_arpc2ko.append(name)
         else:
             else_corr_arpc2ko_cells.append(df)
+            else_corr_arpc2ko.append(corr)
+            else_corr_names_arpc2ko.append(name)
         
     pvals_arpc2ko = np.array(pvals_arpc2ko)
     best_corrs_arpc2ko = np.array(best_corrs_arpc2ko)
@@ -96,13 +113,22 @@ def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
     all_lags_wt = []
     all_corr_wt = []
 
+    neg_corr_wt = []
+    pos_corr_wt = []
+    else_corr_wt = []
+
     names_wt = []
+
+    neg_corr_names_wt = []
+    pos_corr_names_wt = []
+    else_corr_names_wt = []
 
     for df in wt_cells:
         signal1 = df[feature1][:max_lag]
         signal2 = df[feature2][:max_lag]
 
-        names_wt.append(df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0])))
+        name = df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0]))
+        names_wt.append(name)
         
         best_lag, best_corr, pval, lags, corr = cross_correlation_analysis(signal1, signal2)
 
@@ -116,11 +142,19 @@ def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
 
         if best_corr < 0 and np.abs(best_corr) > threshold:
             neg_corr_wt_cells.append(df)
+            neg_corr_wt.append(corr)
+            neg_corr_names_wt.append(name)
         elif np.abs(best_corr) > threshold:
             pos_corr_wt_cells.append(df)
             else_corr_wt_cells.append(df)
+            pos_corr_wt.append(corr)
+            else_corr_wt.append(corr)
+            pos_corr_names_wt.append(name)
+            else_corr_names_wt.append(name)
         else:
             else_corr_wt_cells.append(df)
+            else_corr_wt.append(corr)
+            else_corr_names_wt.append(name)
         
     pvals_wt = np.array(pvals_wt)
     best_corrs_wt = np.array(best_corrs_wt)
@@ -134,12 +168,6 @@ def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
     names_wt = np.array(names_wt)
     names_arpc2ko = np.array(names_arpc2ko)
 
-    pooled_poscorr_arpc2ko = pd.concat(pos_corr_arpc2ko_cells, ignore_index=True)
-    pooled_negcorr_arpc2ko = pd.concat(neg_corr_arpc2ko_cells, ignore_index=True)
-    pooled_else_arpc2ko = pd.concat(else_corr_arpc2ko_cells, ignore_index=True)
-    pooled_poscorr_wt = pd.concat(pos_corr_wt_cells, ignore_index=True)
-    pooled_negcorr_wt = pd.concat(neg_corr_wt_cells, ignore_index=True)
-    pooled_else_wt = pd.concat(else_corr_wt_cells, ignore_index=True)
 
     predictedstates_negcorr_arpc2ko = []
     for df in neg_corr_arpc2ko_cells:
@@ -157,4 +185,4 @@ def apply_cross_corr(feature1, feature2, arpc2ko_cells, wt_cells):
     for df in else_corr_wt_cells:
         predictedstates_else_wt.append(df['state'].to_numpy())
 
-    return pooled_poscorr_arpc2ko, pooled_negcorr_arpc2ko, pooled_else_arpc2ko, pooled_poscorr_wt, pooled_negcorr_wt, pooled_else_wt, predictedstates_negcorr_arpc2ko, predictedstates_else_arpc2ko, predictedstates_negcorr_wt, predictedstates_else_wt
+    return lags, neg_corr_arpc2ko, pos_corr_arpc2ko, else_corr_arpc2ko, pos_corr_arpc2ko_cells, neg_corr_arpc2ko_cells, else_corr_arpc2ko_cells, neg_corr_wt, pos_corr_wt, else_corr_wt, pos_corr_wt_cells, neg_corr_wt_cells, else_corr_wt_cells, predictedstates_negcorr_arpc2ko, predictedstates_else_arpc2ko, predictedstates_negcorr_wt, predictedstates_else_wt

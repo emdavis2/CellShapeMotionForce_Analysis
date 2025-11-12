@@ -86,7 +86,144 @@ wt_cells_states, wt_state0_df, wt_state1_df, wt_state0_mean_summary_df, wt_state
 
 
 feature1 = 'eccentricity'
-feature2 = 'dip_ratio'
-pooled_poscorr_arpc2ko, pooled_negcorr_arpc2ko, pooled_else_arpc2ko, pooled_poscorr_wt, pooled_negcorr_wt, pooled_else_wt, predictedstates_negcorr_arpc2ko, predictedstates_else_arpc2ko, predictedstates_negcorr_wt, predictedstates_else_wt = apply_cross_corr(feature1, feature2, arpc2ko_cells_states, wt_cells_states)
+feature2 = 'avg_trac_mag'
+lags, neg_corr_arpc2ko, pos_corr_arpc2ko, else_corr_arpc2ko, pos_corr_arpc2ko_cells, neg_corr_arpc2ko_cells, else_corr_arpc2ko_cells, neg_corr_wt, pos_corr_wt, else_corr_wt, pos_corr_wt_cells, neg_corr_wt_cells, else_corr_wt_cells, predictedstates_negcorr_arpc2ko, predictedstates_else_arpc2ko, predictedstates_negcorr_wt, predictedstates_else_wt = apply_cross_corr(feature1, feature2, arpc2ko_cells_states, wt_cells_states)
 
+pooled_poscorr_arpc2ko = pd.concat(pos_corr_arpc2ko_cells, ignore_index=True)
+pooled_negcorr_arpc2ko = pd.concat(neg_corr_arpc2ko_cells, ignore_index=True)
+pooled_else_arpc2ko = pd.concat(else_corr_arpc2ko_cells, ignore_index=True)
+pooled_poscorr_wt = pd.concat(pos_corr_wt_cells, ignore_index=True)
+pooled_negcorr_wt = pd.concat(neg_corr_wt_cells, ignore_index=True)
+pooled_else_wt = pd.concat(else_corr_wt_cells, ignore_index=True)
 
+save_path = './figures/cross_corr_{}_{}'.format(feature1, feature2)
+
+#check to see if the path exists, if not make the directory
+if not os.path.exists(save_path):
+  os.mkdir(save_path)
+
+for arr in neg_corr_wt:
+    plt.plot(lags,arr)
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Strong negative cross correlations in WT for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_neg_wt.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+for arr in pos_corr_wt:
+    plt.plot(lags,arr)
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Strong positive cross correlations in WT for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_pos_wt.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+for arr in neg_corr_wt:
+    plt.plot(lags,arr)
+for arr in pos_corr_wt:
+    plt.plot(lags,arr)
+for arr in else_corr_wt:
+    plt.plot(lags,arr)
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Cross correlations in WT for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_all_wt.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+for arr in neg_corr_arpc2ko:
+    plt.plot(lags,arr)
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Strong negative cross correlations in ARPC2KO for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_neg_arpc2ko.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+for arr in pos_corr_arpc2ko:
+    plt.plot(lags,arr)
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Strong positive cross correlations in ARPC2KO for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_pos_arpc2ko.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+for arr in neg_corr_arpc2ko:
+    plt.plot(lags,arr)
+for arr in pos_corr_arpc2ko:
+    plt.plot(lags,arr)
+for arr in else_corr_arpc2ko:
+    plt.plot(lags,arr)
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Cross correlations in ARPC2KO for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_all_arpc2ko.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+all_corr_arpc2ko = neg_corr_arpc2ko + pos_corr_arpc2ko + else_corr_arpc2ko
+all_corr_wt = neg_corr_wt + pos_corr_wt + else_corr_wt
+
+plt.plot(np.average(all_corr_arpc2ko,axis=0))
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Cross correlations in ARPC2KO for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_avg_arpc2ko.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+plt.plot(np.average(all_corr_wt,axis=0))
+plt.xlabel('lags (15 min)')
+plt.ylabel('correlation')
+plt.title('Cross correlations in WT for {} and {}'.format(feature1,feature2))
+plt.savefig('{}/{}_{}_crosscorr_avg_wt.png'.format(save_path, feature1, feature2),bbox_inches='tight')
+plt.clf()
+
+#clears out sentinel file if it exists
+open('{}/strong_neg_wt_names.txt'.format(save_path),'w').close()
+#create new sentinel file to write to
+names_neg_wt = open('{}/strong_neg_wt_names.txt'.format(save_path),'w')
+file_lines_wt = []
+
+#clears out sentinel file if it exists
+open('{}/strong_neg_arpc2ko_names.txt'.format(save_path),'w').close()
+#create new sentinel file to write to
+names_neg_arpc2ko = open('{}/strong_neg_arpc2ko_names.txt'.format(save_path),'w')
+file_lines_arpc2ko = []
+
+#clears out sentinel file if it exists
+open('{}/strong_pos_wt_names.txt'.format(save_path),'w').close()
+#create new sentinel file to write to
+names_pos_wt = open('{}/strong_pos_wt_names.txt'.format(save_path),'w')
+file_lines_pos_wt = []
+
+#clears out sentinel file if it exists
+open('{}/strong_pos_arpc2ko_names.txt'.format(save_path),'w').close()
+#create new sentinel file to write to
+names_pos_arpc2ko = open('{}/strong_pos_arpc2ko_names.txt'.format(save_path),'w')
+file_lines_pos_arpc2ko = []
+
+for df in neg_corr_arpc2ko_cells:
+    name = df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0]))
+    file_lines_arpc2ko.append(name + '\n')
+
+for df in neg_corr_wt_cells:
+    name = df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0]))
+    file_lines_wt.append(name + '\n')
+
+for df in pos_corr_arpc2ko_cells:
+    name = df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0]))
+    file_lines_pos_arpc2ko.append(name + '\n')
+
+for df in pos_corr_wt_cells:
+    name = df['experiment'][0] +'_movie'+str(int(df['movie'][0])) + '_track'+str(int(df['track_id'][0]))
+    file_lines_pos_wt.append(name + '\n')
+
+#write lines to text file 
+names_neg_wt.writelines(file_lines_wt)
+names_neg_wt.close() 
+
+names_neg_arpc2ko.writelines(file_lines_arpc2ko)
+names_neg_arpc2ko.close() 
+
+names_pos_wt.writelines(file_lines_pos_wt)
+names_pos_wt.close() 
+
+names_pos_arpc2ko.writelines(file_lines_pos_arpc2ko)
+names_pos_arpc2ko.close() 

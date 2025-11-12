@@ -125,3 +125,7 @@ def load_skeletondf(csv_path):
 
 
 ##############################################################################################################################################
+
+def parse_list(s):
+    # remove brackets, read floats separated by whitespace
+    return np.fromstring(s.strip("[]"), sep=" ").tolist()

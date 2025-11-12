@@ -24,14 +24,21 @@ def get_states_and_probs(lengths, model, data):
 
 #input is the list of dataframes (arpc2ko_cells or wt_cells) from combine_data() function in assemble_data_functions.py and the list of states from get_states_and _probs() function
 #output is two dataframes of each state that has all tracks concatenated and two other dataframes of each state that has the means of the metrtcs for each track
-def calculate_segment_metrics(cell_df_list, cell_states_list):
+def calculate_segment_metrics(cell_df_list, cell_states_list, cell_state_probs_list):
     pixel_size = 0.645 #microns
+
+    states = {0: 'low force', 1: 'high force'}
 
     updated_df_list = []
     for track in range(len(cell_df_list)):
         track_df = cell_df_list[track]
         states_track = cell_states_list[track]
+        probs_track = cell_state_probs_list[track]
         track_df['state'] = states_track
+        # track_df['state_prob'] = np.max(probs_track,axis=1)
+        track_df['prob_state0'] = probs_track[:,0]
+        track_df['track_name'] = (track_df['experiment'].iloc[0] + '_movie' + str(int(track_df['movie'].iloc[0])) + '_track' + str(int(track_df['track_id'].iloc[0])))
+        track_df['state_name'] = states[track_df["state"].iloc[0]] + " " + track_df["type"]
         updated_df_list.append(track_df)
         
       
@@ -75,8 +82,8 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
     state1_df_final = final_df[final_df['state'] == 1].copy()
 
     type = final_df['type'].iloc[0]
-    state0_df_final['state_name'] = ['state 0 {}'.format(type)] * len(state0_df_final)
-    state1_df_final['state_name'] = ['state 1 {}'.format(type)] * len(state1_df_final)
+    state0_df_final['state_name'] = ['low force {}'.format(type)] * len(state0_df_final)
+    state1_df_final['state_name'] = ['high force {}'.format(type)] * len(state1_df_final)
 
     state0_mean_summary_df = []
     state1_mean_summary_df = []
@@ -100,8 +107,8 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
     state0_mean_summary_df = pd.concat(state0_mean_summary_df,axis=1).T
     state1_mean_summary_df = pd.concat(state1_mean_summary_df,axis=1).T
     
-    state0_mean_summary_df['state_name'] = ['state 0 {}'.format(type)] * len(state0_mean_summary_df)
-    state1_mean_summary_df['state_name'] = ['state 1 {}'.format(type)] * len(state1_mean_summary_df)
+    state0_mean_summary_df['state_name'] = ['low force {}'.format(type)] * len(state0_mean_summary_df)
+    state1_mean_summary_df['state_name'] = ['high force {}'.format(type)] * len(state1_mean_summary_df)
 
     state0_median_summary_df = []
     state1_median_summary_df = []
@@ -125,8 +132,8 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
     state0_median_summary_df = pd.concat(state0_median_summary_df,axis=1).T
     state1_median_summary_df = pd.concat(state1_median_summary_df,axis=1).T
     
-    state0_median_summary_df['state_name'] = ['state 0 {}'.format(type)] * len(state0_median_summary_df)
-    state1_median_summary_df['state_name'] = ['state 1 {}'.format(type)] * len(state1_median_summary_df)
+    state0_median_summary_df['state_name'] = ['low force {}'.format(type)] * len(state0_median_summary_df)
+    state1_median_summary_df['state_name'] = ['high force {}'.format(type)] * len(state1_median_summary_df)
 
     return updated_df_list, state0_df_final, state1_df_final, state0_mean_summary_df, state1_mean_summary_df, state0_median_summary_df, state1_median_summary_df
 
@@ -134,14 +141,14 @@ def calculate_segment_metrics(cell_df_list, cell_states_list):
 #####################################################################################################################################################################################
 
 def stripplot_hmm(param, data_bp, save_path, plot_name):
-    sns.stripplot(data=data_bp, x='state_name', y=param, hue='dishnum',alpha=0.7,palette='deep')
+    sns.stripplot(data=data_bp, x='state_name', y=param, hue='track_name',alpha=0.7,palette='deep',legend=False)
     sns.pointplot(data=data_bp, x="state_name", y=param,linestyle="none",marker="_",markersize=50,capsize=.2,markeredgewidth=3,color=".5",errorbar='sd')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==1], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[0],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==2], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[1],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==3], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[2],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==4], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[3],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==5], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[4],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
-    sns.pointplot(data=data_bp[data_bp['dishnum']==6], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[5],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    # sns.pointplot(data=data_bp[data_bp['dishnum']==1], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[0],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    # sns.pointplot(data=data_bp[data_bp['dishnum']==2], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[1],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    # sns.pointplot(data=data_bp[data_bp['dishnum']==3], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[2],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    # sns.pointplot(data=data_bp[data_bp['dishnum']==4], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[3],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    # sns.pointplot(data=data_bp[data_bp['dishnum']==5], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[4],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
+    # sns.pointplot(data=data_bp[data_bp['dishnum']==6], x="state_name", y=param,linestyle="none",marker="*",color=sns.color_palette('deep')[5],markersize=20,markeredgewidth=1,errorbar=None,markeredgecolor='.5')
     
     plt.xlabel("Type")
     plt.ylabel("{}".format(param))

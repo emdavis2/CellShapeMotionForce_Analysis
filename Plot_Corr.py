@@ -27,7 +27,11 @@ arpc2ko_cells, wt_cells, lengths_arpc2ko, lengths_wt, pooled_arpc2ko_df, pooled_
 numeric_pooled_arpc2ko_df = pooled_arpc2ko_df.select_dtypes(include=np.number)
 numeric_pooled_wt_df = pooled_wt_df.select_dtypes(include=np.number)
 
-save_path = './figures/corr_plots'
+save_path = './figures/corr_plots_wt_only'
+
+#check to see if the path exists, if not make the directory
+if not os.path.exists(save_path):
+  os.mkdir(save_path)
 
 A = numeric_pooled_arpc2ko_df
 B = numeric_pooled_arpc2ko_df
@@ -36,11 +40,11 @@ unique_pairs = list({tuple(sorted((a, b))) for a in A for b in B})
 for pair in unique_pairs:
     column1 = pair[0]
     column2 = pair[1]
-    plt.plot(pooled_wt_df[column1],pooled_wt_df[column2],'.',color='tab:blue',label='WT')
-    plt.plot(pooled_arpc2ko_df[column1],pooled_arpc2ko_df[column2],'.', color='tab:orange',label='ARPC2KO')
+    plt.plot(pooled_wt_df[column1],pooled_wt_df[column2],'.',color='tab:blue',label='WT',alpha=0.25)
+    # plt.plot(pooled_arpc2ko_df[column1],pooled_arpc2ko_df[column2],'.', color='tab:orange',label='ARPC2KO')
 
-    sns.regplot(data=pooled_wt_df, x=column1, y=column2, scatter=False, ci=95, color="tab:blue")
-    sns.regplot(data=pooled_arpc2ko_df, x=column1, y=column2, scatter=False, ci=95, color="tab:orange")
+    # sns.regplot(data=pooled_wt_df, x=column1, y=column2, scatter=False, ci=95, color="tab:blue")
+    # sns.regplot(data=pooled_arpc2ko_df, x=column1, y=column2, scatter=False, ci=95, color="tab:orange")
 
     plt.xlabel('{}'.format(column1))
     plt.ylabel('{}'.format(column2))
